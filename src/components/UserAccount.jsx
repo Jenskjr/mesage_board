@@ -6,7 +6,7 @@ import FormButton from "./ui/FormButton";
 //css
 import { css } from "emotion";
 
-class Profile extends Component {
+class UserAccount extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,40 +15,28 @@ class Profile extends Component {
   }
 
   componentDidMount() {
-    this.getProfile();
-  }
-
-  async getProfile() {
-    const urlParams = window.location.href.split("profile/:");
+    const urlParams = window.location.href.split("user/:");
     const id = urlParams[1];
-    const apiUrl = `http://localhost:5000/api/profiles/${id}`;
-
-    await fetch(apiUrl)
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        const profile = data;
-        this.setState({ profile: profile });
-      });
+    this.props.getUserAccount(id);
   }
 
   render() {
     const { profile } = this.state;
+    const { userAccount } = this.props;
 
     return (
       <div className={container()}>
         <div className="cart">
-          <h2>{profile.name}</h2>
-          <h2>{profile.age} år</h2>
+          <h2>{userAccount.name}</h2>
+          <h2>{userAccount.age} år</h2>
         </div>
         <div>
           <img
             className="image"
-            src={process.env.PUBLIC_URL + `/profileImages/${profile.image}.jpg`}
+            src={process.env.PUBLIC_URL + `/profileImages/${userAccount.image}.jpg`}
           />
         </div>
-        <div>{profile.description}</div>
+        <div className="description">{userAccount.description}</div>
         <Link to={`/`}>
           <FormButton label="Tilbage" />
         </Link>
@@ -62,6 +50,10 @@ const container = () => css`
     display: flex;
     justify-content: space-between;
     max-width: 1000;
+  }
+
+  .description {
+    padding: 1rem 0 2rem 0;
   }
 
   span {
@@ -78,4 +70,4 @@ const container = () => css`
   }
 `;
 
-export default Profile;
+export default UserAccount;

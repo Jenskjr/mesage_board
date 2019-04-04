@@ -26,9 +26,9 @@ const Header = props => {
           <span>Messages</span>
         </Link>
       </div>
-      {props.authed.isAuthed && props.authed.profileName && (
+      {props.account && (
         <div className="profile">
-          <AccountIcon /> {props.authed.profileName}
+          <AccountIcon /> {props.account}
         </div>
       )}
     </header>

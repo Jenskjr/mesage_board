@@ -14,21 +14,20 @@ import Header from "./components/Header";
 import Main from "./components/Main";
 import MessageBoard from "./components/MessageBoard";
 import Home from "./components/Home";
-import Profile from "./components/Profile";
+import UserAccount from "./components/UserAccount";
 import Account from "./components/Account";
 
-//{}
-//[]
-//||
-
 // version 1.
+// Fjern alt der hedder noget med authed og profile
 // Form validation
+// Logud knap i øverste højre hjørne
 // Storage of encrypted passwords
 // Done: Secure storage of user data in localstorage
 // cors policy
 // profileimages. Can be a svg temporarily
 // Github repository
 // Profile image gif
+
 
 // Version 2.
 // Implement redux as state managaer
@@ -40,13 +39,16 @@ const App = () => {
   let initIsAuthed = JSON.parse(localStorage.getItem("isAuthed") || false);
   let initProfileId = localStorage.getItem("profileId");
   let initProfileName = localStorage.getItem("profileName");
+  // old **
   const [authed, setAuthed] = useState({
     isAuthed: initIsAuthed,
     profileId: initProfileId,
     profileName: initProfileName
   });
-  const [account, setAccount] = useState({}) // flyt getAccount til App niveau, fordi authentication skal bruge den funktion
-
+  // Old **
+  const [account, setAccount] = useState({}); // flyt getAccount til App niveau, fordi authentication skal bruge den funktion
+  const [userAccount, setUserAccount] = useState({})
+  const [accounts, setAccounts] = useState({});
   const [errorMessageCreateAccount, setErrorMessageCreateAccount] = useState(
     undefined
   );
@@ -60,6 +62,43 @@ const App = () => {
     localStorage.setItem("profileName", authed.profileName);
   }, [authed]);
 
+  // get account
+  const getAccount = async (id) => {
+    const reqUrl = `${baseUrl}/account/${id}`;
+
+    try {
+      let { data } = await axios.get(reqUrl);
+      setAccount(data)  
+    } catch (error) {
+      console.log(error)
+    } 
+  }
+
+   // get account
+   const getUserAccount = async (id) => {
+    const reqUrl = `${baseUrl}/account/${id}`;
+
+    try {
+      let { data } = await axios.get(reqUrl);
+      setUserAccount(data)  
+    } catch (error) {
+      console.log(error)
+    } 
+  }
+
+  // get accounts
+  const getAccounts = async () => {
+    const reqUrl = `${baseUrl}/accounts/`;
+
+    try {
+      let { data } = await axios.get(reqUrl);
+      setAccounts(data)  
+    } catch (error) {
+      console.log(error)
+    } 
+  }
+
+  // authentication
   const handleAuthentication = async (validLogin, userName, password) => {
     try {
       if (validLogin === false) {
@@ -68,6 +107,7 @@ const App = () => {
         const reqUrl = `${baseUrl}/auth/${userName}`;
         let { data } = await axios.get(reqUrl);
         setAuthed({ isAuthed: true, profileId: data.id, profileName: data.name });
+        getAccount(data.id)
       }
     } catch (error) {
       console.log(error);
@@ -80,14 +120,15 @@ const App = () => {
   const handleLogOut = evt => {
     evt.preventDefault();
     setAuthed({ isAuthed: false, profileName: undefined });
+    setAccount({});
   };
 
+  // create account
   const handleCreateAccount = async newAccount => {
-    const reqUrl = `${baseUrl}/profiles`;
+    const reqUrl = `${baseUrl}/account`;
 
     try {
       let { data } = await axios.post(reqUrl, newAccount);
-      console.log(data);
       await handleAuthentication(true, data.name, "dfgfdgfdg");
     } catch (error) {
       console.log(error);
@@ -100,7 +141,7 @@ const App = () => {
   return (
     <Router>
       <div className={container()}>
-        <Header authed={authed} />
+        <Header account={account.name} authed={authed} />
         <Main className="main">
           <Switch>
             <Route
@@ -115,10 +156,20 @@ const App = () => {
                   baseUrl={baseUrl}
                   errorMessageCreateAccount={errorMessageCreateAccount}
                   errorMessageAuthentication={errorMessageAuthentication}
+                  getAccount={getAccount}
+                  account={account}
                 />
               )}
             />
-            <Route path="/profile/:id" component={Profile} />
+            <Route path="/user/:id" 
+              render={props => (
+                <UserAccount
+                  {...props}
+                  getUserAccount={getUserAccount}
+                  userAccount={userAccount} 
+                />
+              )}
+            />
             <Route
               path="/messages"
               render={props => (
@@ -131,8 +182,16 @@ const App = () => {
                 />
               )}
             />
-            <Route exact path="/frontpage" component={Home} />
-            <Route path="/profile/:id" component={Profile} />
+            <Route exact path="/frontpage" // Frontpage eller Home ?
+            render={props => (
+              <Home
+                {...props}
+                getAccounts={getAccounts}
+                accounts={accounts}
+              />
+            )} 
+            />
+            {/* <Route path="/profile/:id" component={UserAccount} /> */}
             <Route path="/" render={() => <Redirect to="/frontpage" />} />
           </Switch>
         </Main>

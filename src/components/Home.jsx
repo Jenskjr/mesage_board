@@ -10,43 +10,31 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      profiles: {},
-      profile: undefined
+      // profiles: {},
+      // profile: undefined
     };
   }
 
   componentDidMount() {
-    this.getProfiles();
-  }
-
-  async getProfiles() {
-    const apiUrl = `http://localhost:5000/api/profiles/`;
-
-    await fetch(apiUrl)
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        const profiles = data;
-        this.setState({ profiles: profiles });
-      });
+    this.props.getAccounts();
   }
 
   render() {
-    const { profiles } = this.state;
+    const { accounts } = this.props;
 
     return (
       <div className={container()}>
         <div>
-          {profiles.length > 0 &&
-            profiles.map((obj, index) => (
+          {accounts.length > 0 &&
+            accounts.map((obj, index) => (
               <div key={index} className="card">
                 <div className="card-top">
                   <AccountIcon />
                   <h2>{obj.name}</h2>
                 </div>
                 <div className="description">{obj.description}</div>
-                <Link to={`/profile/:${obj.id}`}>
+                {/* account */}
+                <Link to={`/user/:${obj.id}`}>
                   <FormButton
                     label="Se min profil"
                     iconLeft={<AccountIcon />}
@@ -62,12 +50,11 @@ class Home extends Component {
 
 const container = () => css`
   .card {
-    margin: 1rem;
+
 
     .card-top {
       display: flex;
       align-items: center;
-      padding: 0 1rem 0 1rem;
 
       h2,
       svg {
@@ -76,7 +63,7 @@ const container = () => css`
     }
 
     .description {
-      padding: 0 1rem 1rem 1rem;
+      padding: 1rem 0 2rem 0;
     }
 
     img {
