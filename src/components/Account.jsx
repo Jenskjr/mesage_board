@@ -7,11 +7,12 @@ import FileInput from "./ui/FileInput";
 //css
 import { css } from "emotion";
 import { ErrorIcon } from "mdi-react";
+import TextArea from "./ui/TextArea";
 
 //{}
 //[]
 
-// Edge case 1: Create account if user already exists
+
 
 class Account extends Component {
   constructor(props) {
@@ -22,8 +23,32 @@ class Account extends Component {
       createAccount: false,
       createAccountName: "",
       createAccountPassword: "",
-      createAccountAge: ""
+      createAccountAge: "", 
+      createAccountText: "", 
+      account: {}
+    
     };
+  }
+
+  componentDidMount() {
+    const {isAuthed, profileId, profileName} = this.props.authed
+    isAuthed && profileId && profileName&& this.getProfile(profileId);
+  }
+
+  componentWillUnmount() {
+    this.setState({account: {}})
+  }
+
+  getProfile = async (id) => {
+    const reqUrl = `http://localhost:5000/api/profile/${id}`;
+
+    try {
+      let { data } = await axios.get(reqUrl);
+      console.log("getProfile: " + JSON.stringify(data))
+      this.setState({account: data})   
+    } catch (error) {
+      console.log(error)
+    } 
   }
 
   handleFormChange = evt => {
@@ -53,12 +78,13 @@ class Account extends Component {
 
   handleSubmitCreateAccount = async evt => {
     evt.preventDefault();
-
+    console.log("text: " + this.state.createAccountText)
     // create copy of state?
     const newAccount = {
       name: this.state.createAccountName,
       password: this.state.createAccountPassword,
-      age: this.state.createAccountAge
+      age: this.state.createAccountAge,
+      text: this.state.createAccountText
     };
 
     this.props.createAccount(newAccount);
@@ -71,7 +97,9 @@ class Account extends Component {
       loginPassword,
       createAccountName,
       createAccountPassword,
-      createAccountAge
+      createAccountAge, 
+      createAccountText,
+      account
     } = this.state;
 
     return (
@@ -81,7 +109,11 @@ class Account extends Component {
             {console.log(authed)}
             <h1>Profil oplysninger</h1>
             <h2>Navn</h2>
-            <p>{authed.profileName && authed.profileName}</p>
+            <p>{account.name && account.name}</p>
+            <h2>Alder</h2>
+            <p>{account.age && account.age}</p>
+            <h2>Profiltekst</h2>
+            <p>{account.description && account.description}</p>
             <FormButton
               label="log ud"
               style={{ marginTop: "1rem" }}
@@ -114,12 +146,13 @@ class Account extends Component {
                 handleChange={this.handleFormChange}
                 initText="Kodeord"
               />
+              {/* Errormessage */}
               {this.state.valTxtPassword && (
                 <p className="error-message">
                   <ErrorIcon /> {this.state.valTxtPassword}
                 </p>
               )}
-
+             
               <FormButton
                 label="log ind"
                 style={{ marginTop: "1rem" }}
@@ -169,7 +202,12 @@ class Account extends Component {
                   handleChange={this.handleFormChange}
                   initText="Alder"
                 />
-
+                 <h2>Profiltekst</h2>
+                 <TextArea 
+                  name="createAccountText" 
+                  value={createAccountText} 
+                  handleChange={this.handleFormChange} 
+                  initText="Profiltext"/>
                 <FormButton
                   handleSubmit={this.handleSubmitCreateAccount}
                   label="Send"

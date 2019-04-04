@@ -38,11 +38,15 @@ import Account from "./components/Account";
 const App = () => {
   const baseUrl = `http://localhost:5000/api`;
   let initIsAuthed = JSON.parse(localStorage.getItem("isAuthed") || false);
+  let initProfileId = localStorage.getItem("profileId");
   let initProfileName = localStorage.getItem("profileName");
   const [authed, setAuthed] = useState({
     isAuthed: initIsAuthed,
+    profileId: initProfileId,
     profileName: initProfileName
   });
+  const [account, setAccount] = useState({}) // flyt getAccount til App niveau, fordi authentication skal bruge den funktion
+
   const [errorMessageCreateAccount, setErrorMessageCreateAccount] = useState(
     undefined
   );
@@ -52,6 +56,7 @@ const App = () => {
 
   useEffect(() => {
     localStorage.setItem("isAuthed", authed.isAuthed);
+    localStorage.setItem("profileId", authed.profileId);
     localStorage.setItem("profileName", authed.profileName);
   }, [authed]);
 
@@ -62,7 +67,7 @@ const App = () => {
       } else if (validLogin === true && userName && password) {
         const reqUrl = `${baseUrl}/auth/${userName}`;
         let { data } = await axios.get(reqUrl);
-        setAuthed({ isAuthed: true, profileName: data.name });
+        setAuthed({ isAuthed: true, profileId: data.id, profileName: data.name });
       }
     } catch (error) {
       console.log(error);
@@ -82,7 +87,7 @@ const App = () => {
 
     try {
       let { data } = await axios.post(reqUrl, newAccount);
-      //console.log(data);
+      console.log(data);
       await handleAuthentication(true, data.name, "dfgfdgfdg");
     } catch (error) {
       console.log(error);

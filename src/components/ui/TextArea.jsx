@@ -9,6 +9,7 @@ const TextArea = props => {
     <div className={container()} style={props.style}>
       <textarea
         rows="4"
+        name={props.name}  
         onChange={props.handleChange}
         placeholder={props.initText}
         value={props.message}

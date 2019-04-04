@@ -5,7 +5,7 @@ import axios from "axios";
 
 //css
 import { css } from "emotion";
-import { SendIcon } from "mdi-react";
+import { SendIcon, AccountIcon } from "mdi-react";
 
 //{}
 
@@ -110,12 +110,19 @@ class MessageBoard extends Component {
           <div className="list">
             {this.state.posts.length > 0 &&
               [...this.state.posts].reverse().map((obj, index) => (
-                <div key={index} style={{ marginTop: "1rem" }}>
-                  <div>
-                    {(obj.profileName && obj.profileName) || "Ukendt bruger"}
+                <div className="message" key={index} style={{ marginTop: "1rem" }}>
+                  <div className="header">
+                    <div>
+                      <AccountIcon/>
+                    </div>
+                    <div>
+                      <p>{obj.profileName !== "undefined" || undefined ? obj.profileName: "Ukendt bruger"}</p>
+                      <p>{obj.dateTime}</p>
+                    </div>
                   </div>
-                  <div>{obj.dateTime}</div>
-                  <div>{obj.message}</div>
+                  <div className="body">
+                    {obj.message}
+                  </div>
                 </div>
               ))}
           </div>
@@ -129,8 +136,27 @@ const container = () => css`
   .list {
     margin-top: 1rem;
 
+    .header {
+      display: flex; 
+    
+      svg {
+        padding: 0.25rem 0.5rem 0 0;
+        font-size: 1.5rem;
+        height: 40px;
+        width: 40px;
+      }
+
+      p {
+        margin:0;
+      }
+    }
+
+    .body  {
+      padding-top: 0.5rem;
+    }
+
     .message {
-      padding-bottom: 1rem;
+      padding-top: 1rem;
     }
   }
 
