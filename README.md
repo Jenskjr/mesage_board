@@ -1,2 +1,2 @@
-# mesage_board
+# message_board
 Communication forum example
