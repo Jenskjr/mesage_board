@@ -1,13 +1,12 @@
 import React, { useState, Component } from "react";
-import axios from "axios";
 import TextInput from "./ui/TextInput";
 import FormButton from "./ui/FormButton";
-import FileInput from "./ui/FileInput";
 
 //css
 import { css } from "emotion";
 import { ErrorIcon } from "mdi-react";
 import TextArea from "./ui/TextArea";
+
 
 class Account extends Component {
   constructor(props) {
@@ -23,11 +22,6 @@ class Account extends Component {
     };
   }
 
-  componentDidMount() {
-    const {isAuthed, profileId, profileName} = this.props.authed
-    isAuthed && profileId && profileName&& this.props.getAccount(profileId);
-  }
-
   handleFormChange = evt => {
     this.setState({ [evt.target.name]: evt.target.value });
   };
@@ -36,6 +30,7 @@ class Account extends Component {
     evt.preventDefault();
     const { loginName, loginPassword } = this.state;
 
+    // vaidation
     this.setState({ valTxtPassword: "", valTxtName: "" });
     loginName === "" && this.setState({ valTxtName: "Navn skal være udfyldt" });
     loginPassword < 3 &&
@@ -44,30 +39,38 @@ class Account extends Component {
       });
 
     if (loginName && loginPassword) {
-      this.props.setAuthed(
-        true,
-        this.state.loginName,
-        this.state.loginPassword
-      );
+      
+      this.props.handleLogIn(true, loginName, loginPassword)
+      // this.props.getAccount(2); // 
       this.setState({ loginName: "", loginPassword: "" });
     }
   };
 
   handleSubmitCreateAccount = async evt => {
     evt.preventDefault();
-    // create copy of state?
-    const newAccount = {
-      name: this.state.createAccountName,
-      password: this.state.createAccountPassword,
-      age: this.state.createAccountAge,
-      text: this.state.createAccountText
-    };
+    const { createAccountName, createAccountPassword, createAccountAge, createAccountText } = this.state;
 
-    this.props.createAccount(newAccount);
+    // validation
+    this.setState({valTxtCreateName: "", valTxtCreatePaseword: "", valTxtCreateAge: "", valTxtCreateText: ""});
+    createAccountName === "" && this.setState({valTxtCreateName: "Navn mangler at blive udfyldt"})
+    createAccountPassword === "" && this.setState({valTxtCreatePassword: "Adgagnskode mangler at blive udfyldt"})
+    createAccountAge === "" && this.setState({valTxtCreateAge: "Alder mangler at blive udfyldt"})
+    createAccountText === "" && this.setState({valTxtCreateText: "Profiltext mangler at blive udfyldt"})
+
+    if (createAccountName && createAccountPassword && createAccountAge && createAccountText) {
+          // create copy of state?
+          const newAccount = {
+            name: this.state.createAccountName,
+            password: this.state.createAccountPassword,
+            age: this.state.createAccountAge,
+            text: this.state.createAccountText
+          };
+          this.props.createAccount(newAccount);
+    }
   };
 
   render() {
-    const { authed, account } = this.props;
+    const { account } = this.props;
     const {
       loginName,
       loginPassword,
@@ -79,7 +82,7 @@ class Account extends Component {
 
     return (
       <div className={container()}>
-        {authed.isAuthed && (
+        {account.id && (
           <div>
             <h1>Profil oplysninger</h1>
             <h2>Navn</h2>
@@ -95,7 +98,7 @@ class Account extends Component {
             />
           </div>
         )}
-        {!authed.isAuthed && (
+        {!account.id && (
           <>
             <form>
               <h1>Log ind</h1>
@@ -111,6 +114,7 @@ class Account extends Component {
                 <p className="error-message">
                   <ErrorIcon />
                   {this.state.valTxtName}
+               
                 </p>
               )}
               <h2>Kodeord</h2>
@@ -162,6 +166,12 @@ class Account extends Component {
                   handleChange={this.handleFormChange}
                   initText="Navn"
                 />
+                {this.state.valTxtCreateName && (
+                  <p className="error-message">
+                    <ErrorIcon />
+                    {this.state.valTxtCreateName}
+                  </p>
+                )}
                 <h2>Password</h2>
                 <TextInput
                   name="createAccountPassword"
@@ -169,6 +179,12 @@ class Account extends Component {
                   handleChange={this.handleFormChange}
                   initText="Password"
                 />
+                 {this.state.valTxtCreatePassword && (
+                  <p className="error-message">
+                    <ErrorIcon />
+                    {this.state.valTxtCreatePassword}
+                  </p>
+                )}
                 <h2>Alder</h2>
                 <TextInput
                   name="createAccountAge"
@@ -176,12 +192,24 @@ class Account extends Component {
                   handleChange={this.handleFormChange}
                   initText="Alder"
                 />
+                 {this.state.valTxtCreateAge && (
+                  <p className="error-message">
+                    <ErrorIcon />
+                    {this.state.valTxtCreateAge}
+                  </p>
+                )}
                  <h2>Profiltekst</h2>
                  <TextArea 
                   name="createAccountText" 
                   value={createAccountText} 
                   handleChange={this.handleFormChange} 
                   initText="Profiltext"/>
+                  {this.state.valTxtCreateText && (
+                    <p className="error-message">
+                      <ErrorIcon />
+                      {this.state.valTxtCreateText}
+                    </p>
+                  )}
                 <FormButton
                   handleSubmit={this.handleSubmitCreateAccount}
                   label="Send"
@@ -190,9 +218,12 @@ class Account extends Component {
                 {this.props.errorMessageCreateAccount && (
                   <p className="error-message">
                     <ErrorIcon />
-                    {this.props.errorMessageCreateAccount}
+                    {this.props.errorMessageCreateAccount} 
+                    {this.props.unsetErrorMessageCreateAccount()}
                   </p>
                 )}
+                
+                
               </form>
             )}
           </>

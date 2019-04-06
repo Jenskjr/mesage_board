@@ -7,14 +7,8 @@ import { AccountIcon } from "mdi-react";
 import FormButton from "./ui/FormButton";
 
 class Home extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      // profiles: {},
-      // profile: undefined
-    };
-  }
 
+  // UseEffect ????
   componentDidMount() {
     this.props.getAccounts();
   }

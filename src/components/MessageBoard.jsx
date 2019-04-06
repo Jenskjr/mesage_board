@@ -20,6 +20,7 @@ class MessageBoard extends Component {
     };
   }
 
+  // UseEffect
   componentDidMount() {
     this.getPostsRequest();
   }
@@ -37,10 +38,7 @@ class MessageBoard extends Component {
     if (this.state.message.length > 0) {
       const thisMessage = this.state.message;
       const thisProfileName =
-        this.props.authed.profileName === null
-          ? "Ukendt bruger"
-          : this.props.authed.profileName;
-
+        this.props.account.name ? this.props.account.name: "Ukendt bruger"
       const post = { profileName: thisProfileName, message: thisMessage };
       this.sendPostRequest(post);
     }

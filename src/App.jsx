@@ -18,37 +18,28 @@ import UserAccount from "./components/UserAccount";
 import Account from "./components/Account";
 
 // version 1.
-// Fjern alt der hedder noget med authed og profile
-// Form validation
+
+
 // Logud knap i øverste højre hjørne
 // Storage of encrypted passwords
-// Done: Secure storage of user data in localstorage
+// Secure storage of user data in localstorage
 // cors policy
-// profileimages. Can be a svg temporarily
-// Github repository
-// Profile image gif
-
+// setTimeOut inserts 8????
 
 // Version 2.
-// Implement redux as state managaer
+// Implement redux state managaer
+// implementere database
 
-// Bug ved refresh, når man ikke er logget ind -> cleary
+// Version 3 
+// image upload
+
 
 const App = () => {
   const baseUrl = `http://localhost:5000/api`;
-  let initIsAuthed = JSON.parse(localStorage.getItem("isAuthed") || false);
-  let initProfileId = localStorage.getItem("profileId");
-  let initProfileName = localStorage.getItem("profileName");
-  // old **
-  const [authed, setAuthed] = useState({
-    isAuthed: initIsAuthed,
-    profileId: initProfileId,
-    profileName: initProfileName
-  });
-  // Old **
-  const [account, setAccount] = useState({}); // flyt getAccount til App niveau, fordi authentication skal bruge den funktion
-  const [userAccount, setUserAccount] = useState({})
+  let authToken = localStorage.getItem("authToken") || false;
+  const [account, setAccount] = useState({}); 
   const [accounts, setAccounts] = useState({});
+  const [userAccount, setUserAccount] = useState({})
   const [errorMessageCreateAccount, setErrorMessageCreateAccount] = useState(
     undefined
   );
@@ -56,12 +47,10 @@ const App = () => {
     undefined
   );
 
-  useEffect(() => {
-    localStorage.setItem("isAuthed", authed.isAuthed);
-    localStorage.setItem("profileId", authed.profileId);
-    localStorage.setItem("profileName", authed.profileName);
-  }, [authed]);
+  useEffect(() => {account.id ? localStorage.setItem("authToken", account.id): localStorage.removeItem("authToken")}, [account])
 
+  useEffect(() => {authToken !== false && getAccount(authToken); console.log("Authtoken: " + authToken); console.log("Account: "); console.log(account)}, [authToken])
+  
   // get account
   const getAccount = async (id) => {
     const reqUrl = `${baseUrl}/account/${id}`;
@@ -98,15 +87,13 @@ const App = () => {
     } 
   }
 
-  // authentication
-  const handleAuthentication = async (validLogin, userName, password) => {
+  // login
+  const handleLogIn = async (validLogin, userName, password) => {
     try {
-      if (validLogin === false) {
-        setAuthed({ isAuthed: false, authedProfile: undefined });
-      } else if (validLogin === true && userName && password) {
+     if (validLogin === true && userName && password) {
         const reqUrl = `${baseUrl}/auth/${userName}`;
         let { data } = await axios.get(reqUrl);
-        setAuthed({ isAuthed: true, profileId: data.id, profileName: data.name });
+
         getAccount(data.id)
       }
     } catch (error) {
@@ -117,10 +104,11 @@ const App = () => {
     }
   };
 
+  // logout
   const handleLogOut = evt => {
     evt.preventDefault();
-    setAuthed({ isAuthed: false, profileName: undefined });
-    setAccount({});
+    localStorage.removeItem("authToken")
+    setAccount({})
   };
 
   // create account
@@ -129,7 +117,7 @@ const App = () => {
 
     try {
       let { data } = await axios.post(reqUrl, newAccount);
-      await handleAuthentication(true, data.name, "dfgfdgfdg");
+      await handleLogIn(true, data.name, "dfgfdgfdg");
     } catch (error) {
       console.log(error);
       setErrorMessageCreateAccount(
@@ -138,10 +126,17 @@ const App = () => {
     }
   };
 
+  const unsetErrorMessageCreateAccount = () => {
+    setTimeout(() => {
+      setErrorMessageCreateAccount(undefined)
+    }, 10000);
+    
+  }
+
   return (
     <Router>
       <div className={container()}>
-        <Header account={account.name} authed={authed} />
+        <Header account={account.name} handleLogOut={handleLogOut} />
         <Main className="main">
           <Switch>
             <Route
@@ -149,15 +144,15 @@ const App = () => {
               render={props => (
                 <Account
                   {...props}
-                  authed={authed}
-                  setAuthed={handleAuthentication}
                   createAccount={handleCreateAccount}
-                  handleLogOut={handleLogOut}
                   baseUrl={baseUrl}
                   errorMessageCreateAccount={errorMessageCreateAccount}
+                  unsetErrorMessageCreateAccount = {unsetErrorMessageCreateAccount}
                   errorMessageAuthentication={errorMessageAuthentication}
                   getAccount={getAccount}
                   account={account}
+                  handleLogOut={handleLogOut}
+                  handleLogIn={handleLogIn}
                 />
               )}
             />
@@ -175,9 +170,7 @@ const App = () => {
               render={props => (
                 <MessageBoard
                   {...props}
-                  authed={authed}
-                  isAuthed={authed.isAuthed}
-                  authedProfile={authed.profileName}
+                  account={account}
                   baseUrl={baseUrl}
                 />
               )}
