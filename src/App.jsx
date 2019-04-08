@@ -19,12 +19,13 @@ import Account from "./components/Account";
 
 // version 1.
 
-
-// Logud knap i øverste højre hjørne
-// Storage of encrypted passwords
-// Secure storage of user data in localstorage
+// Flere oplysninger i profiler
+// Rediger profil mangler
+// spinner på load a data
+// password
 // cors policy
 // setTimeOut inserts 8????
+// Fejlbesked cannot update unmonted compnent
 
 // Version 2.
 // Implement redux state managaer
@@ -49,7 +50,7 @@ const App = () => {
 
   useEffect(() => {account.id ? localStorage.setItem("authToken", account.id): localStorage.removeItem("authToken")}, [account])
 
-  useEffect(() => {authToken !== false && getAccount(authToken); console.log("Authtoken: " + authToken); console.log("Account: "); console.log(account)}, [authToken])
+  useEffect(() => {authToken !== false && getAccount(authToken); getAccounts(); console.log("Authtoken: " + authToken); console.log("Account: "); console.log(account)}, [authToken])
   
   // get account
   const getAccount = async (id) => {
@@ -57,7 +58,7 @@ const App = () => {
 
     try {
       let { data } = await axios.get(reqUrl);
-      setAccount(data)  
+      await setAccount(data)  
     } catch (error) {
       console.log(error)
     } 
@@ -78,14 +79,21 @@ const App = () => {
   // get accounts
   const getAccounts = async () => {
     const reqUrl = `${baseUrl}/accounts/`;
-
+    console.log("get accounts")
     try {
       let { data } = await axios.get(reqUrl);
-      setAccounts(data)  
+      if (account.id) {
+        let dataExeptAuthed;
+        dataExeptAuthed = data.filter(x => x.id !== account.id);
+        setAccounts(dataExeptAuthed)
+      }
+      else setAccounts(data)
     } catch (error) {
       console.log(error)
     } 
   }
+
+  
 
   // login
   const handleLogIn = async (validLogin, userName, password) => {
@@ -105,10 +113,10 @@ const App = () => {
   };
 
   // logout
-  const handleLogOut = evt => {
-    evt.preventDefault();
+  const handleLogOut = () => {
+    console.log("log out")
     localStorage.removeItem("authToken")
-    setAccount({})
+    setAccount({}, console.log("set account"))
   };
 
   // create account
@@ -126,11 +134,16 @@ const App = () => {
     }
   };
 
+  const unsetErrorMessageLogIn = () => {
+    setTimeout(() => {
+      setErrorMessageAuthentication(undefined)
+    }, 10000);
+  }
+
   const unsetErrorMessageCreateAccount = () => {
     setTimeout(() => {
       setErrorMessageCreateAccount(undefined)
     }, 10000);
-    
   }
 
   return (
@@ -146,9 +159,10 @@ const App = () => {
                   {...props}
                   createAccount={handleCreateAccount}
                   baseUrl={baseUrl}
+                  errorMessageAuthentication={errorMessageAuthentication}
+                  unsetErrorMessageLogIn={unsetErrorMessageLogIn}
                   errorMessageCreateAccount={errorMessageCreateAccount}
                   unsetErrorMessageCreateAccount = {unsetErrorMessageCreateAccount}
-                  errorMessageAuthentication={errorMessageAuthentication}
                   getAccount={getAccount}
                   account={account}
                   handleLogOut={handleLogOut}

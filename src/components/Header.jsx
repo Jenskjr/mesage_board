@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { HomeIcon, AccountIcon, MessageIcon } from "mdi-react";
 import { css } from "emotion";
-import FormButton from "./ui/FormButton";
 
 //{}
 
@@ -15,19 +14,19 @@ const Header = props => {
       <div>
         <Link to="/">
           <HomeIcon />
-          <span>Home</span>
+          <span>Hjem</span>
         </Link>
       </div>
       <div>
         <Link to="/account">
           <AccountIcon />
-          <span>Account</span>
+          <span>Konto</span>
         </Link>
       </div>
       <div>
         <Link to="/messages">
           <MessageIcon />
-          <span>Messages</span>
+          <span>Beskeder</span>
         </Link>
       </div>
       {props.account && (
@@ -39,7 +38,7 @@ const Header = props => {
     {props.account && logOutButton === true && (
     <nav>
       <div className="right">
-        <button onClick={props.handleLogOut}>
+        <button onClick={() => {props.handleLogOut(); setLogOutButton(false)}}>
           LogOut
         </button>
       </div>

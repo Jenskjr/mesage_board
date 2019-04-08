@@ -15,10 +15,11 @@ class Account extends Component {
       loginName: "",
       loginPassword: "",
       createAccount: false,
+      editProfile: false,
       createAccountName: "",
       createAccountPassword: "",
       createAccountAge: "", 
-      createAccountText: ""
+      createAccountText: "",
     };
   }
 
@@ -69,6 +70,21 @@ class Account extends Component {
     }
   };
 
+  showErrorMessage = validationText => {
+      return (
+       <> 
+      <p className="error-message">
+        <ErrorIcon />
+        {validationText}
+      </p>
+      {setTimeout(() => {this.setState({"valTxtName": ""})}, 10000)}
+      </>)
+  }
+
+  handleSaveProfile = () => {
+    console.log("Save profile")
+  }
+
   render() {
     const { account } = this.props;
     const {
@@ -84,18 +100,37 @@ class Account extends Component {
       <div className={container()}>
         {account.id && (
           <div>
-            <h1>Profil oplysninger</h1>
-            <h2>Navn</h2>
-            <p>{account.name && account.name}</p>
-            <h2>Alder</h2>
-            <p>{account.age && account.age}</p>
-            <h2>Profiltekst</h2>
-            <p className="desciption">{account.description && account.description}</p>
-            <FormButton
-              label="log ud"
-              style={{ marginTop: "1rem" }}
-              handleSubmit={this.props.handleLogOut}
-            />
+            {!this.state.editProfile &&
+              <>
+                <h1>Profil oplysninger</h1>
+                <h2>Navn</h2>
+                <p>{account.name && account.name}</p>
+                <h2>Alder</h2>
+                <p>{account.age && account.age}</p>
+                <h2>Profiltekst</h2>
+                <p className="desciption">{account.description && account.description}</p>
+                <FormButton
+                  label="Rediger profil"
+                  style={{ marginTop: "1rem" }}
+                  handleSubmit={() => {this.setState({editProfile: !this.state.editProfile})}}
+                />
+              </>}
+              {this.state.editProfile && 
+              <div>
+                Rediger profil 
+                <FormButton
+                  label="Gem"
+                  style={{ marginTop: "1rem" }}
+                  handleSubmit={this.handleSaveProfile}
+                />
+                <FormButton
+                  label="Annuller"
+                  style={{ marginTop: "1rem" }}
+                  handleSubmit={() => {this.setState({editProfile: !this.state.editProfile})}}
+                />
+              </div>}
+
+            
           </div>
         )}
         {!account.id && (
@@ -109,13 +144,8 @@ class Account extends Component {
                 handleChange={this.handleFormChange}
                 initText="Brugernavn"
               />
-
               {this.state.valTxtName && (
-                <p className="error-message">
-                  <ErrorIcon />
-                  {this.state.valTxtName}
-               
-                </p>
+                this.showErrorMessage(this.state.valTxtName)
               )}
               <h2>Kodeord</h2>
               <TextInput
@@ -130,7 +160,6 @@ class Account extends Component {
                   <ErrorIcon /> {this.state.valTxtPassword}
                 </p>
               )}
-             
               <FormButton
                 label="log ind"
                 style={{ marginTop: "1rem" }}
@@ -141,6 +170,7 @@ class Account extends Component {
                 <p className="error-message">
                   <ErrorIcon />
                   {this.props.errorMessageAuthentication}
+                  {this.props.unsetErrorMessageLogIn()}
                 </p>
               )}
             </form>

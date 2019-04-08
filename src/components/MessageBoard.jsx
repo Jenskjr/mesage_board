@@ -86,7 +86,7 @@ class MessageBoard extends Component {
           <form>
             <h2>Skriv en besked</h2>
             <TextArea
-              initText="Type your message"
+              initText="Skriv en besked"
               handleChange={this.handleFormChange}
               message={this.state.message}
             />
