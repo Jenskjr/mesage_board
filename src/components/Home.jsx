@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 
 import { css } from "emotion";
 import { Link } from "react-router-dom";
@@ -6,18 +6,14 @@ import { AccountIcon } from "mdi-react";
 // Components
 import FormButton from "./ui/FormButton";
 
-class Home extends Component {
+const Frontpage = props => {
+  const { accounts } = props;
+  //  useEffect(() => {
+  //   console.log("Component did mount")
+  // }, []);
 
-  // UseEffect ????
-  componentDidMount() {
-    this.props.getAccounts();
-  }
-
-  render() {
-    const { accounts } = this.props;
-
-    return (
-      <div className={container()}>
+  return (
+    <div className={container()}>
         <div>
           {accounts.length > 0 &&
             accounts.map((obj, index) => (
@@ -38,8 +34,7 @@ class Home extends Component {
             ))}
         </div>
       </div>
-    );
-  }
+  )
 }
 
 const container = () => css`
@@ -72,4 +67,4 @@ const container = () => css`
   }
 `;
 
-export default Home;
+export default Frontpage;

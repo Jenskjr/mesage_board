@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 //Components
 import FormButton from "./ui/FormButton";
@@ -6,50 +6,60 @@ import FormButton from "./ui/FormButton";
 //css
 import { css } from "emotion";
 
-class UserAccount extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      profile: {}
-    };
-  }
+const UserAccount = props => {
+  const { userAccount } = props;
 
-  componentDidMount() {
+  useEffect(() => {
     const urlParams = window.location.href.split("user/:");
     const id = urlParams[1];
-    this.props.getUserAccount(id);
-  }
+    props.getUserAccount(id);
+  },[])
 
-  render() {
-    const { profile } = this.state;
-    const { userAccount } = this.props;
-
-    return (
-      <div className={container()}>
+  return (
+    <div className={container()}>
         <div className="cart">
-          <h2>{userAccount.name}</h2>
-          <h2>{userAccount.age} år</h2>
+            <img
+              className="image"
+              src={process.env.PUBLIC_URL + `/profileImages/${userAccount.image}.jpg`}
+            />
+            <div>
+              <h2>{userAccount.name}</h2>
+              <p>{userAccount.age} år</p>
+              <p>{userAccount.occupation}</p>
+              <p>{userAccount.region}</p>
+            </div>
+          
         </div>
         <div>
-          <img
-            className="image"
-            src={process.env.PUBLIC_URL + `/profileImages/${userAccount.image}.jpg`}
-          />
         </div>
         <div className="description">{userAccount.description}</div>
         <Link to={`/`}>
           <FormButton label="Tilbage" />
         </Link>
-      </div>
-    );
-  }
-}
+      </div> 
+  )
+} 
 
 const container = () => css`
   .cart {
     display: flex;
-    justify-content: space-between;
     max-width: 1000;
+
+    img {
+      width: 40%;
+      padding: 1rem;
+      border: 1px solid gray;
+    }
+
+    div {
+      padding: 0 1rem;
+
+      h2 {margin-top: 0;}
+
+      p {
+        margin: 0.2rem 0 0.2rem 0;
+      }
+    }
   }
 
   .description {

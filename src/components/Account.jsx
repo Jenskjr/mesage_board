@@ -4,7 +4,7 @@ import FormButton from "./ui/FormButton";
 
 //css
 import { css } from "emotion";
-import { ErrorIcon } from "mdi-react";
+import { ErrorIcon, EditIcon, CancelIcon, NewBoxIcon, SendIcon, AccountIcon, AccountNetworkIcon, AccountPlusIcon, AccountEditIcon } from "mdi-react";
 import TextArea from "./ui/TextArea";
 
 
@@ -15,7 +15,7 @@ class Account extends Component {
       loginName: "",
       loginPassword: "",
       createAccount: false,
-      editProfile: false,
+      editAccount: JSON.parse(localStorage.getItem("editAccount")) || false,
       createAccountName: "",
       createAccountPassword: "",
       createAccountAge: "", 
@@ -94,41 +94,93 @@ class Account extends Component {
       createAccountPassword,
       createAccountAge, 
       createAccountText,
+      editAccount
     } = this.state;
 
     return (
       <div className={container()}>
         {account.id && (
           <div>
-            {!this.state.editProfile &&
+            {!this.state.editAccount &&
               <>
                 <h1>Profil oplysninger</h1>
                 <h2>Navn</h2>
                 <p>{account.name && account.name}</p>
                 <h2>Alder</h2>
                 <p>{account.age && account.age}</p>
+                <h2>Beskæftigelse</h2>
+                <p>{account.occupation && account.occupation}</p>
+                <h2>Region</h2>
+                <p>{account.region && account.region}</p>
                 <h2>Profiltekst</h2>
                 <p className="desciption">{account.description && account.description}</p>
                 <FormButton
                   label="Rediger profil"
+                  iconLeft={<AccountEditIcon/>}
                   style={{ marginTop: "1rem" }}
-                  handleSubmit={() => {this.setState({editProfile: !this.state.editProfile})}}
+                  handleSubmit={() => {this.setState({editAccount: true}, () => localStorage.setItem("editAccount", this.state.editAccount)) }}
                 />
               </>}
-              {this.state.editProfile && 
-              <div>
-                Rediger profil 
+              {this.state.editAccount && 
+              <>
+              <h1>Rediger brugeroplysninger</h1>
+              <h2>Brugernavn</h2>
+              <TextInput
+                name="loginName"
+                value={account.name}
+                handleChange={this.handleFormChange}
+              />
+              {this.state.valTxtName && (
+                this.showErrorMessage(this.state.valTxtName)
+              )}
+              <h2>Kodeord</h2>
+              <TextInput
+                name="loginPassword"
+                value={account.password}
+                handleChange={this.handleFormChange}
+              />
+              <h2>Alder</h2>
+                <TextInput
+                  name="createAccountAge"
+                  value={account.age}
+                  handleChange={this.handleFormChange}
+                />
+                 {this.state.valTxtCreateAge && (
+                  <p className="error-message">
+                    <ErrorIcon />
+                    {this.state.valTxtCreateAge}
+                  </p>
+                )}
+                 <h2>Profiltekst</h2>
+                 <TextArea 
+                  name="createAccountText" 
+                  value={account.description}
+                  handleChange={this.handleFormChange} />
+                  {this.state.valTxtCreateText && (
+                    <p className="error-message">
+                      <ErrorIcon />
+                      {this.state.valTxtCreateText}
+                    </p>
+                  )}
+              {/* Errormessage */}
+              {this.state.valTxtPassword && (
+                <p className="error-message">
+                  <ErrorIcon /> {this.state.valTxtPassword}
+                </p>
+              )}
                 <FormButton
                   label="Gem"
+                  iconLeft={<SendIcon/>}
                   style={{ marginTop: "1rem" }}
                   handleSubmit={this.handleSaveProfile}
                 />
                 <FormButton
                   label="Annuller"
+                  iconLeft={<CancelIcon/>}
                   style={{ marginTop: "1rem" }}
-                  handleSubmit={() => {this.setState({editProfile: !this.state.editProfile})}}
+                  handleSubmit={() => {this.setState({editAccount: false}, () => localStorage.removeItem("editAccount"))}}
                 />
-              </div>}
+              </>}
 
             
           </div>
@@ -162,6 +214,7 @@ class Account extends Component {
               )}
               <FormButton
                 label="log ind"
+                iconLeft={<AccountIcon/>}
                 style={{ marginTop: "1rem" }}
                 handleSubmit={this.handleSubmitLogin}
               />
@@ -178,6 +231,7 @@ class Account extends Component {
               <div>
                 <FormButton
                   label="Lav en ny profil"
+                  iconLeft={<AccountPlusIcon/>}
                   style={{ marginTop: "1rem" }}
                   handleSubmit={() => {
                     this.setState({ createAccount: true });
@@ -243,6 +297,7 @@ class Account extends Component {
                 <FormButton
                   handleSubmit={this.handleSubmitCreateAccount}
                   label="Send"
+                  iconLeft={<SendIcon/>}
                   style={{ marginTop: "1rem" }}
                 />
                 {this.props.errorMessageCreateAccount && (

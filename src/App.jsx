@@ -13,27 +13,29 @@ import axios from "axios";
 import Header from "./components/Header";
 import Main from "./components/Main";
 import MessageBoard from "./components/MessageBoard";
-import Home from "./components/Home";
+import Frontpage from "./components/Home";
 import UserAccount from "./components/UserAccount";
 import Account from "./components/Account";
 
-// version 1.
+// version 1.0
 
-// Flere oplysninger i profiler
+// Flere oplysninger i profiler (igang)
+// Fejl adgangkode mangler at blive udfyldt
 // Rediger profil mangler
-// spinner på load a data
 // password
 // cors policy
 // setTimeOut inserts 8????
-// Fejlbesked cannot update unmonted compnent
 
-// Version 2.
+// Version 2.0
+// spinner på load a data
 // Implement redux state managaer
 // implementere database
 
-// Version 3 
+// Version 3.0
 // image upload
 
+// Version 4.0
+// Database connection
 
 const App = () => {
   const baseUrl = `http://localhost:5000/api`;
@@ -47,15 +49,14 @@ const App = () => {
   const [errorMessageAuthentication, setErrorMessageAuthentication] = useState(
     undefined
   );
-
+  
+  // on StateDidUpdate
   useEffect(() => {account.id ? localStorage.setItem("authToken", account.id): localStorage.removeItem("authToken")}, [account])
-
   useEffect(() => {authToken !== false && getAccount(authToken); getAccounts(); console.log("Authtoken: " + authToken); console.log("Account: "); console.log(account)}, [authToken])
   
   // get account
   const getAccount = async (id) => {
     const reqUrl = `${baseUrl}/account/${id}`;
-
     try {
       let { data } = await axios.get(reqUrl);
       await setAccount(data)  
@@ -63,7 +64,8 @@ const App = () => {
       console.log(error)
     } 
   }
-
+  
+    // der er noget galt med id 1 - 5
    // get account
    const getUserAccount = async (id) => {
     const reqUrl = `${baseUrl}/account/${id}`;
@@ -91,9 +93,7 @@ const App = () => {
     } catch (error) {
       console.log(error)
     } 
-  }
-
-  
+  } 
 
   // login
   const handleLogIn = async (validLogin, userName, password) => {
@@ -191,14 +191,13 @@ const App = () => {
             />
             <Route exact path="/frontpage" // Frontpage eller Home ?
             render={props => (
-              <Home
+              <Frontpage
                 {...props}
                 getAccounts={getAccounts}
                 accounts={accounts}
               />
             )} 
             />
-            {/* <Route path="/profile/:id" component={UserAccount} /> */}
             <Route path="/" render={() => <Redirect to="/frontpage" />} />
           </Switch>
         </Main>
@@ -208,6 +207,12 @@ const App = () => {
 };
 
 const container = () => css`
+  max-width: 500px;
+  border: 1px solid gray;
+  margin: 2rem auto 0 auto;
+  height: 1000px;
+  overflow: scroll;
+
   header {
     display: flex;
 
