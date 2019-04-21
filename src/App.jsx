@@ -19,8 +19,8 @@ import Account from "./components/Account";
 
 // version 1.0
 
-// bug i edit profile. Den skal flyttes til sin egen selvstændige component, så jeg kan bruge component did mount
 // cors policy
+// Omskriving af account -> create account m. UseState
 // setTimeOut inserts 8????
 // spinner på log in
 

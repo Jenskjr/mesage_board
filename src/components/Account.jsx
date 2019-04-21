@@ -7,6 +7,7 @@ import TextInput from "./ui/TextInput";
 import FormButton from "./ui/FormButton";
 import TextArea from "./ui/TextArea";
 import Warning from "./ui/Warning";
+import EditAccount from "./EditAccount";
 
 class Account extends Component {
   constructor(props) {
@@ -23,23 +24,6 @@ class Account extends Component {
       createAccountOccupation: "",
       createAccountRegion: ""
     };
-  }
-
-  componentWillReceiveProps () {
-    this.setInitionalFormValues();
-  }
-
-  componentDidMount () {
-    this.setInitionalFormValues();
-  }
-
-  setInitionalFormValues = () => {
-    this.setState({editAccountName: this.props.account.name});
-    this.setState({editAccountPassword: this.props.account.password});
-    this.setState({editAccountAge: this.props.account.age});
-    this.setState({editAccountOccupation: this.props.account.occupation});
-    this.setState({editAccountRegion: this.props.account.region});
-    this.setState({editAccountText: this.props.account.text});
   }
 
   handleFormChange = evt => {
@@ -64,51 +48,6 @@ class Account extends Component {
       this.setState({ loginName: "", loginPassword: "" });
     }
   };
-
-  handleUpdateAccount = e => {
-    e.preventDefault();
-    
-    const { 
-      editAccountName, 
-      editAccountPassword, 
-      editAccountAge, 
-      editAccountOccupation,
-      editAccountRegion,
-      editAccountText
-    } = this.state;
-
-    this.clearAllErrorMessages();
-
-    // De skal laves en funktion hver for sig 
-    if (editAccountName === undefined || editAccountName === "") this.setState({valTxtName: "Navn mangler at blive udfyldt"})
-    if (editAccountPassword === undefined || editAccountPassword === "") this.setState({valTxtPassword: "Adgagnskode mangler at blive udfyldt"})
-    if (editAccountAge === undefined || editAccountAge === "") this.setState({valTxtAge: "Alder mangler at blive udfyldt"})
-    if (editAccountOccupation === undefined || editAccountOccupation === "") this.setState({valTxtOccupation: "Beskæftigelse mangler at blive udfyldt"});
-    if (editAccountRegion === undefined || editAccountRegion === "") this.setState({valTxtRegion: "Region mangler at blive udfyldt"})
-    if (editAccountText === undefined || editAccountText === "") this.setState({valTxtText: "Profiltekst mangler at blive udfyldt"})
-  
-    if (
-      editAccountName && 
-      editAccountPassword && 
-      editAccountAge && 
-      editAccountOccupation && 
-      editAccountRegion && 
-      editAccountText
-    ) {
-      const updatedAccount = {
-        id: this.props.account.id,
-        name: editAccountName,
-        password: editAccountPassword,
-        age: editAccountAge,
-        occupation: editAccountOccupation,
-        region: editAccountRegion,
-        text: editAccountText
-      };
-      this.props.updateAccount(updatedAccount);
-      localStorage.removeItem("editAccount");
-      this.setState({editAccount: false});
-    }
-  }
 
   handleSubmitAccount = e => {
     e.preventDefault();
@@ -163,9 +102,14 @@ class Account extends Component {
     });
   }
 
-  handleSaveProfile = () => {
-    console.log("Save profile")
+  handleUnsetEdit = () => {
+    this.setState({editAccount: false}, () => localStorage.removeItem("editAccount"));
+    this.clearAllErrorMessages()
   }
+
+  // handleSaveProfile = () => {
+  //   console.log("Save profile")
+  // }
 
   render() {
     const { account } = this.props;
@@ -220,65 +164,10 @@ class Account extends Component {
               </>}
               {/* Edit account */}
               {this.state.editAccount && 
-              <>
-              <h1>Rediger brugeroplysninger</h1>
-              <h2>Brugernavn</h2>
-              <TextInput
-                name="editAccountName"
-                defaultValue={account.name}
-                handleChange={this.handleFormChange}
-              />
-              <Warning validationText={valTxtName}/>
-              <h2>Kodeord</h2>
-              <TextInput
-                name="editAccountPassword"
-                dafaultValue={account.password}
-                handleLoad={this.handleFormLoad}
-                handleChange={this.handleFormChange}
-              />
-              <Warning validationText={valTxtPassword}/>
-              <h2>Alder</h2>
-              <TextInput
-                name="editAccountAge"
-                defaultValue={account.age}
-                handleChange={this.handleFormChange}
-              />
-              <Warning validationText={valTxtAge}/>
-              <h2>Beskæftigelse</h2>
-              <TextInput
-                name="editAccountOccupation"
-                defaultValue={account.occupation}
-                handleChange={this.handleFormChange}
-              />
-              <Warning validationText={valTxtOccupation}/>
-              <h2>Region</h2>
-              <TextInput
-                name="editAccountRegion"
-                defaultValue={account.region}
-                handleChange={this.handleFormChange}
-              />
-              <Warning validationText={valTxtRegion}/>              
-              <h2>Profiltekst</h2>
-              <TextArea 
-                rows={20}
-                name="editAccountText" 
-                defaultValue={account.text}
-                handleChange={this.handleFormChange} 
-              />
-              <Warning validationText={valTxtText}/>
-              <FormButton
-                label="Gem"
-                iconLeft={<SendIcon/>}
-                style={{ marginTop: "1rem" }}
-                handleSubmit={this.handleUpdateAccount}
-              />
-              <FormButton
-                label="Annuller"
-                iconLeft={<CancelIcon/>}
-                style={{ marginTop: "1rem" }}
-                handleSubmit={() => {this.setState({editAccount: false}, () => localStorage.removeItem("editAccount"));this.clearAllErrorMessages()}}
-              />
-            </>}
+                <EditAccount 
+                  account={account} 
+                  unsetEdit={this.handleUnsetEdit} 
+                  updateAccount={this.props.updateAccount}/>}
           </div>
         )}
         {/* Login or create account */}

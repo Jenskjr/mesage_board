@@ -8,9 +8,6 @@ import FormButton from "./ui/FormButton";
 
 const Frontpage = props => {
   const { accounts } = props;
-  //  useEffect(() => {
-  //   console.log("Component did mount")
-  // }, []);
 
   return (
     <div className={container()}>
