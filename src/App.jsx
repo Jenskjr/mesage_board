@@ -19,15 +19,12 @@ import Account from "./components/Account";
 
 // version 1.0
 
-// Flere oplysninger i profiler (igang)
-// Fejl adgangkode mangler at blive udfyldt
-// Rediger profil mangler
-// password
+// bug i edit profile. Den skal flyttes til sin egen selvstændige component, så jeg kan bruge component did mount
 // cors policy
 // setTimeOut inserts 8????
+// spinner på log in
 
 // Version 2.0
-// spinner på load a data
 // Implement redux state managaer
 // implementere database
 
@@ -52,7 +49,9 @@ const App = () => {
   
   // on StateDidUpdate
   useEffect(() => {account.id ? localStorage.setItem("authToken", account.id): localStorage.removeItem("authToken")}, [account])
-  useEffect(() => {authToken !== false && getAccount(authToken); getAccounts(); console.log("Authtoken: " + authToken); console.log("Account: "); console.log(account)}, [authToken])
+  useEffect(() => {authToken !== false && 
+    getAccount(authToken); 
+    getAccounts()}, [authToken])
   
   // get account
   const getAccount = async (id) => {
@@ -64,24 +63,10 @@ const App = () => {
       console.log(error)
     } 
   }
-  
-    // der er noget galt med id 1 - 5
-   // get account
-   const getUserAccount = async (id) => {
-    const reqUrl = `${baseUrl}/account/${id}`;
-
-    try {
-      let { data } = await axios.get(reqUrl);
-      setUserAccount(data)  
-    } catch (error) {
-      console.log(error)
-    } 
-  }
 
   // get accounts
   const getAccounts = async () => {
     const reqUrl = `${baseUrl}/accounts/`;
-    console.log("get accounts")
     try {
       let { data } = await axios.get(reqUrl);
       if (account.id) {
@@ -94,14 +79,25 @@ const App = () => {
       console.log(error)
     } 
   } 
+  
+  // get account
+  const getUserAccount = async (id) => {
+    const reqUrl = `${baseUrl}/account/${id}`;
+
+    try {
+      let { data } = await axios.get(reqUrl);
+      setUserAccount(data)  
+    } catch (error) {
+      console.log(error)
+    } 
+  }
 
   // login
   const handleLogIn = async (validLogin, userName, password) => {
     try {
-     if (validLogin === true && userName && password) {
-        const reqUrl = `${baseUrl}/auth/${userName}`;
-        let { data } = await axios.get(reqUrl);
-
+     if (userName && password) {
+        const reqUrl = `${baseUrl}/auth/`;
+        let { data } = await axios.get(reqUrl, { 'headers': {'userName': userName, 'token': password}});
         getAccount(data.id)
       }
     } catch (error) {
@@ -114,18 +110,27 @@ const App = () => {
 
   // logout
   const handleLogOut = () => {
-    console.log("log out")
     localStorage.removeItem("authToken")
     setAccount({}, console.log("set account"))
   };
 
+  // update account
+  const handleUpdateAccount = async updatedAccount => {
+    const reqUrl = `${baseUrl}/account/${updatedAccount.id}`
+    try {
+      let { data } = await axios.put(reqUrl, updatedAccount);
+      setAccount(data);  
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   // create account
   const handleCreateAccount = async newAccount => {
     const reqUrl = `${baseUrl}/account`;
-
     try {
       let { data } = await axios.post(reqUrl, newAccount);
-      await handleLogIn(true, data.name, "dfgfdgfdg");
+      await handleLogIn(true, data.name, data.password);
     } catch (error) {
       console.log(error);
       setErrorMessageCreateAccount(
@@ -157,14 +162,15 @@ const App = () => {
               render={props => (
                 <Account
                   {...props}
-                  createAccount={handleCreateAccount}
                   baseUrl={baseUrl}
+                  getAccount={getAccount}
+                  createAccount={handleCreateAccount}
+                  updateAccount={handleUpdateAccount}
+                  account={account}
                   errorMessageAuthentication={errorMessageAuthentication}
                   unsetErrorMessageLogIn={unsetErrorMessageLogIn}
                   errorMessageCreateAccount={errorMessageCreateAccount}
                   unsetErrorMessageCreateAccount = {unsetErrorMessageCreateAccount}
-                  getAccount={getAccount}
-                  account={account}
                   handleLogOut={handleLogOut}
                   handleLogIn={handleLogIn}
                 />
@@ -209,7 +215,7 @@ const App = () => {
 const container = () => css`
   max-width: 500px;
   border: 1px solid gray;
-  margin: 2rem auto 0 auto;
+  margin: 0 auto 0 auto;
   height: 1000px;
   overflow: scroll;
 

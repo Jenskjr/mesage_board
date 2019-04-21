@@ -30,17 +30,17 @@ const Header = props => {
         </Link>
       </div>
       {props.account && (
-        <div className="profile" onClick={() => setLogOutButton(true)}>
-          <AccountIcon /> {props.account}
+        <div className="profile" onClick={() => setLogOutButton(!logOutButton)}>
+          {props.account}
         </div>
       )}
     </header>
     {props.account && logOutButton === true && (
     <nav>
       <div className="right">
-        <button onClick={() => {props.handleLogOut(); setLogOutButton(false)}}>
+        <div onClick={() => {props.handleLogOut(); setLogOutButton(false)}}>
           LogOut
-        </button>
+        </div>
       </div>
     </nav>
     )}
@@ -51,25 +51,37 @@ const Header = props => {
 const container = () => css`
   header {
     display: flex;
-  }
+    background-color: #4877E5;
   
-  .profile {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
+    svg {
+      color: white;
+    }
+
+    a {
+      color: white;
+      text-decoration: none;
+    }
+  
+    .profile {
+      display: flex;
+      margin-left: auto;
+      margin-right: 0.5rem;
+      color: white;
+      font-weight: bold;
+    }
   }
 
   nav {
     display: flex;
+    border-bottom: 1px solid #4877E5;
     .right {
       margin-left: auto;
-      margin-right: 1rem;
+      margin-right: 0.5rem;
 
-      button {
-        all: unset;
-        text-decoration: none;
+      > div {
         cursor: pointer;
-        padding: 0.5rem;
+        padding: 1rem;
+        color: #4877E5;
         svg {
           margin-right: 1rem;
         }

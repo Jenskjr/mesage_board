@@ -1,26 +1,45 @@
-import React, { useState, Component } from "react";
-import TextInput from "./ui/TextInput";
-import FormButton from "./ui/FormButton";
-
+import React, { Component } from "react";
 //css
 import { css } from "emotion";
-import { ErrorIcon, EditIcon, CancelIcon, NewBoxIcon, SendIcon, AccountIcon, AccountNetworkIcon, AccountPlusIcon, AccountEditIcon } from "mdi-react";
+import { ErrorIcon, CancelIcon, SendIcon, AccountIcon, AccountPlusIcon, AccountEditIcon } from "mdi-react";
+// components
+import TextInput from "./ui/TextInput";
+import FormButton from "./ui/FormButton";
 import TextArea from "./ui/TextArea";
-
+import Warning from "./ui/Warning";
 
 class Account extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      editAccount: JSON.parse(localStorage.getItem("editAccount")) || false,
       loginName: "",
       loginPassword: "",
       createAccount: false,
-      editAccount: JSON.parse(localStorage.getItem("editAccount")) || false,
       createAccountName: "",
       createAccountPassword: "",
       createAccountAge: "", 
       createAccountText: "",
+      createAccountOccupation: "",
+      createAccountRegion: ""
     };
+  }
+
+  componentWillReceiveProps () {
+    this.setInitionalFormValues();
+  }
+
+  componentDidMount () {
+    this.setInitionalFormValues();
+  }
+
+  setInitionalFormValues = () => {
+    this.setState({editAccountName: this.props.account.name});
+    this.setState({editAccountPassword: this.props.account.password});
+    this.setState({editAccountAge: this.props.account.age});
+    this.setState({editAccountOccupation: this.props.account.occupation});
+    this.setState({editAccountRegion: this.props.account.region});
+    this.setState({editAccountText: this.props.account.text});
   }
 
   handleFormChange = evt => {
@@ -42,43 +61,106 @@ class Account extends Component {
     if (loginName && loginPassword) {
       
       this.props.handleLogIn(true, loginName, loginPassword)
-      // this.props.getAccount(2); // 
       this.setState({ loginName: "", loginPassword: "" });
     }
   };
 
-  handleSubmitCreateAccount = async evt => {
-    evt.preventDefault();
-    const { createAccountName, createAccountPassword, createAccountAge, createAccountText } = this.state;
+  handleUpdateAccount = e => {
+    e.preventDefault();
+    
+    const { 
+      editAccountName, 
+      editAccountPassword, 
+      editAccountAge, 
+      editAccountOccupation,
+      editAccountRegion,
+      editAccountText
+    } = this.state;
+
+    this.clearAllErrorMessages();
+
+    // De skal laves en funktion hver for sig 
+    if (editAccountName === undefined || editAccountName === "") this.setState({valTxtName: "Navn mangler at blive udfyldt"})
+    if (editAccountPassword === undefined || editAccountPassword === "") this.setState({valTxtPassword: "Adgagnskode mangler at blive udfyldt"})
+    if (editAccountAge === undefined || editAccountAge === "") this.setState({valTxtAge: "Alder mangler at blive udfyldt"})
+    if (editAccountOccupation === undefined || editAccountOccupation === "") this.setState({valTxtOccupation: "Beskæftigelse mangler at blive udfyldt"});
+    if (editAccountRegion === undefined || editAccountRegion === "") this.setState({valTxtRegion: "Region mangler at blive udfyldt"})
+    if (editAccountText === undefined || editAccountText === "") this.setState({valTxtText: "Profiltekst mangler at blive udfyldt"})
+  
+    if (
+      editAccountName && 
+      editAccountPassword && 
+      editAccountAge && 
+      editAccountOccupation && 
+      editAccountRegion && 
+      editAccountText
+    ) {
+      const updatedAccount = {
+        id: this.props.account.id,
+        name: editAccountName,
+        password: editAccountPassword,
+        age: editAccountAge,
+        occupation: editAccountOccupation,
+        region: editAccountRegion,
+        text: editAccountText
+      };
+      this.props.updateAccount(updatedAccount);
+      localStorage.removeItem("editAccount");
+      this.setState({editAccount: false});
+    }
+  }
+
+  handleSubmitAccount = e => {
+    e.preventDefault();
+    const { 
+      createAccountName, 
+      createAccountPassword, 
+      createAccountAge, 
+      createAccountText,
+      createAccountOccupation,
+      createAccountRegion
+    } = this.state;
 
     // validation
-    this.setState({valTxtCreateName: "", valTxtCreatePaseword: "", valTxtCreateAge: "", valTxtCreateText: ""});
-    createAccountName === "" && this.setState({valTxtCreateName: "Navn mangler at blive udfyldt"})
-    createAccountPassword === "" && this.setState({valTxtCreatePassword: "Adgagnskode mangler at blive udfyldt"})
-    createAccountAge === "" && this.setState({valTxtCreateAge: "Alder mangler at blive udfyldt"})
-    createAccountText === "" && this.setState({valTxtCreateText: "Profiltext mangler at blive udfyldt"})
+    this.clearAllErrorMessages();
+    // De skal laves en funktion hver for sig 
+    if (createAccountName === undefined || createAccountName === "" ) this.setState({valTxtName: "Navn mangler at blive udfyldt"})
+    if (createAccountPassword === undefined || createAccountPassword === "" ) this.setState({valTxtPassword: "Adgagnskode mangler at blive udfyldt"})
+    if (createAccountAge === undefined || createAccountAge === "" ) this.setState({valTxtAge: "Alder mangler at blive udfyldt"})
+    if (createAccountOccupation === undefined || createAccountOccupation === "" ) this.setState({valTxtOccupation: "Beskæftigelse mangler at blive udfyldt"});
+    if (createAccountRegion === undefined ||  createAccountRegion === "" ) this.setState({valTxtRegion: "Region mangler at blive udfyldt"})
+    if (createAccountText === undefined || createAccountText === "" ) this.setState({valTxtText: "Profiltekst mangler at blive udfyldt"})
 
-    if (createAccountName && createAccountPassword && createAccountAge && createAccountText) {
-          // create copy of state?
+    // create account
+ 
+    if (
+      createAccountName && 
+      createAccountPassword && 
+      createAccountAge &&  
+      createAccountOccupation && 
+      createAccountRegion && 
+      createAccountText) {
           const newAccount = {
-            name: this.state.createAccountName,
-            password: this.state.createAccountPassword,
-            age: this.state.createAccountAge,
-            text: this.state.createAccountText
+            name: createAccountName,
+            password: createAccountPassword,
+            age: createAccountAge,
+            occupation: createAccountOccupation,
+            region: createAccountRegion,
+            text: createAccountText
           };
           this.props.createAccount(newAccount);
     }
   };
 
-  showErrorMessage = validationText => {
-      return (
-       <> 
-      <p className="error-message">
-        <ErrorIcon />
-        {validationText}
-      </p>
-      {setTimeout(() => {this.setState({"valTxtName": ""})}, 10000)}
-      </>)
+  clearAllErrorMessages = () => {
+    this.setState({
+      valTxtName: "", 
+      valTxtPassword: "", 
+      valTxtAge: "", 
+      valTxtOccupation: "",
+      valTxtRegion: "",
+      valTxtText: ""
+    });
   }
 
   handleSaveProfile = () => {
@@ -92,15 +174,24 @@ class Account extends Component {
       loginPassword,
       createAccountName,
       createAccountPassword,
-      createAccountAge, 
+      createAccountAge,
+      createAccountOccupation,
+      createAccountRegion, 
       createAccountText,
-      editAccount
+      valTxtName,
+      valTxtPassword,
+      valTxtAge,
+      valTxtOccupation,
+      valTxtRegion,
+      valTxtText
+
     } = this.state;
 
     return (
       <div className={container()}>
         {account.id && (
           <div>
+            {/* Account info */}
             {!this.state.editAccount &&
               <>
                 <h1>Profil oplysninger</h1>
@@ -113,80 +204,87 @@ class Account extends Component {
                 <h2>Region</h2>
                 <p>{account.region && account.region}</p>
                 <h2>Profiltekst</h2>
-                <p className="desciption">{account.description && account.description}</p>
+                <p className="desciption">{account.text && account.text}</p>
                 <FormButton
                   label="Rediger profil"
                   iconLeft={<AccountEditIcon/>}
                   style={{ marginTop: "1rem" }}
-                  handleSubmit={() => {this.setState({editAccount: true}, () => localStorage.setItem("editAccount", this.state.editAccount)) }}
+                  handleSubmit={() => {this.setState({editAccount: true}, () => localStorage.setItem("editAccount", this.state.editAccount)); this.clearAllErrorMessages() }}
+                />
+                <FormButton
+                  label="Log ud"
+                  iconLeft={<AccountEditIcon/>}
+                  style={{ marginTop: "1rem" }}
+                  handleSubmit={() => {this.props.handleLogOut()}}
                 />
               </>}
+              {/* Edit account */}
               {this.state.editAccount && 
               <>
               <h1>Rediger brugeroplysninger</h1>
               <h2>Brugernavn</h2>
               <TextInput
-                name="loginName"
-                value={account.name}
+                name="editAccountName"
+                defaultValue={account.name}
                 handleChange={this.handleFormChange}
               />
-              {this.state.valTxtName && (
-                this.showErrorMessage(this.state.valTxtName)
-              )}
+              <Warning validationText={valTxtName}/>
               <h2>Kodeord</h2>
               <TextInput
-                name="loginPassword"
-                value={account.password}
+                name="editAccountPassword"
+                dafaultValue={account.password}
+                handleLoad={this.handleFormLoad}
                 handleChange={this.handleFormChange}
               />
+              <Warning validationText={valTxtPassword}/>
               <h2>Alder</h2>
-                <TextInput
-                  name="createAccountAge"
-                  value={account.age}
-                  handleChange={this.handleFormChange}
-                />
-                 {this.state.valTxtCreateAge && (
-                  <p className="error-message">
-                    <ErrorIcon />
-                    {this.state.valTxtCreateAge}
-                  </p>
-                )}
-                 <h2>Profiltekst</h2>
-                 <TextArea 
-                  name="createAccountText" 
-                  value={account.description}
-                  handleChange={this.handleFormChange} />
-                  {this.state.valTxtCreateText && (
-                    <p className="error-message">
-                      <ErrorIcon />
-                      {this.state.valTxtCreateText}
-                    </p>
-                  )}
-              {/* Errormessage */}
-              {this.state.valTxtPassword && (
-                <p className="error-message">
-                  <ErrorIcon /> {this.state.valTxtPassword}
-                </p>
-              )}
-                <FormButton
-                  label="Gem"
-                  iconLeft={<SendIcon/>}
-                  style={{ marginTop: "1rem" }}
-                  handleSubmit={this.handleSaveProfile}
-                />
-                <FormButton
-                  label="Annuller"
-                  iconLeft={<CancelIcon/>}
-                  style={{ marginTop: "1rem" }}
-                  handleSubmit={() => {this.setState({editAccount: false}, () => localStorage.removeItem("editAccount"))}}
-                />
-              </>}
-
-            
+              <TextInput
+                name="editAccountAge"
+                defaultValue={account.age}
+                handleChange={this.handleFormChange}
+              />
+              <Warning validationText={valTxtAge}/>
+              <h2>Beskæftigelse</h2>
+              <TextInput
+                name="editAccountOccupation"
+                defaultValue={account.occupation}
+                handleChange={this.handleFormChange}
+              />
+              <Warning validationText={valTxtOccupation}/>
+              <h2>Region</h2>
+              <TextInput
+                name="editAccountRegion"
+                defaultValue={account.region}
+                handleChange={this.handleFormChange}
+              />
+              <Warning validationText={valTxtRegion}/>              
+              <h2>Profiltekst</h2>
+              <TextArea 
+                rows={20}
+                name="editAccountText" 
+                defaultValue={account.text}
+                handleChange={this.handleFormChange} 
+              />
+              <Warning validationText={valTxtText}/>
+              <FormButton
+                label="Gem"
+                iconLeft={<SendIcon/>}
+                style={{ marginTop: "1rem" }}
+                handleSubmit={this.handleUpdateAccount}
+              />
+              <FormButton
+                label="Annuller"
+                iconLeft={<CancelIcon/>}
+                style={{ marginTop: "1rem" }}
+                handleSubmit={() => {this.setState({editAccount: false}, () => localStorage.removeItem("editAccount"));this.clearAllErrorMessages()}}
+              />
+            </>}
           </div>
         )}
+        {/* Login or create account */}
         {!account.id && (
           <>
+            {!this.state.createAccount && <>
             <form>
               <h1>Log ind</h1>
               <h2>Brugernavn</h2>
@@ -196,9 +294,7 @@ class Account extends Component {
                 handleChange={this.handleFormChange}
                 initText="Brugernavn"
               />
-              {this.state.valTxtName && (
-                this.showErrorMessage(this.state.valTxtName)
-              )}
+              <Warning validationText={valTxtName}/>              
               <h2>Kodeord</h2>
               <TextInput
                 name="loginPassword"
@@ -206,12 +302,7 @@ class Account extends Component {
                 handleChange={this.handleFormChange}
                 initText="Kodeord"
               />
-              {/* Errormessage */}
-              {this.state.valTxtPassword && (
-                <p className="error-message">
-                  <ErrorIcon /> {this.state.valTxtPassword}
-                </p>
-              )}
+              <Warning validationText={valTxtPassword}/>
               <FormButton
                 label="log ind"
                 iconLeft={<AccountIcon/>}
@@ -227,18 +318,19 @@ class Account extends Component {
                 </p>
               )}
             </form>
-            {!this.state.createAccount && (
-              <div>
-                <FormButton
-                  label="Lav en ny profil"
-                  iconLeft={<AccountPlusIcon/>}
-                  style={{ marginTop: "1rem" }}
-                  handleSubmit={() => {
-                    this.setState({ createAccount: true });
-                  }}
-                />
-              </div>
-            )}
+            <div>
+              <FormButton
+                label="Lav en ny profil"
+                iconLeft={<AccountPlusIcon/>}
+                style={{ marginTop: "1rem" }}
+                handleSubmit={() => {
+                  this.clearAllErrorMessages();
+                  this.setState({ createAccount: true });
+                }}
+              />
+            </div>
+            </>}
+            {/* Create account */}
             {this.state.createAccount && (
               <form>
                 {/*Form validation mangler */}
@@ -250,25 +342,15 @@ class Account extends Component {
                   handleChange={this.handleFormChange}
                   initText="Navn"
                 />
-                {this.state.valTxtCreateName && (
-                  <p className="error-message">
-                    <ErrorIcon />
-                    {this.state.valTxtCreateName}
-                  </p>
-                )}
+                <Warning validationText={valTxtName}/> 
                 <h2>Password</h2>
                 <TextInput
                   name="createAccountPassword"
                   value={createAccountPassword}
                   handleChange={this.handleFormChange}
-                  initText="Password"
+                  initText="Kodeord"
                 />
-                 {this.state.valTxtCreatePassword && (
-                  <p className="error-message">
-                    <ErrorIcon />
-                    {this.state.valTxtCreatePassword}
-                  </p>
-                )}
+                <Warning validationText={valTxtPassword}/>
                 <h2>Alder</h2>
                 <TextInput
                   name="createAccountAge"
@@ -276,28 +358,38 @@ class Account extends Component {
                   handleChange={this.handleFormChange}
                   initText="Alder"
                 />
-                 {this.state.valTxtCreateAge && (
-                  <p className="error-message">
-                    <ErrorIcon />
-                    {this.state.valTxtCreateAge}
-                  </p>
-                )}
-                 <h2>Profiltekst</h2>
-                 <TextArea 
+                <Warning validationText={valTxtAge}/>
+                <h2>Beskæftigelse</h2>
+                <TextInput 
+                  name="createAccountOccupation" 
+                  value={createAccountOccupation} 
+                  handleChange={this.handleFormChange} 
+                  initText="Beskæftigelse"/>
+                <Warning validationText={valTxtOccupation}/>
+                <h2>Region</h2>
+                <TextInput 
+                  name="createAccountRegion" 
+                  value={createAccountRegion} 
+                  handleChange={this.handleFormChange} 
+                  initText="Region"/>
+                <Warning validationText={valTxtRegion}/>
+                <h2>Profiltekst</h2>
+                <TextArea 
                   name="createAccountText" 
                   value={createAccountText} 
                   handleChange={this.handleFormChange} 
-                  initText="Profiltext"/>
-                  {this.state.valTxtCreateText && (
-                    <p className="error-message">
-                      <ErrorIcon />
-                      {this.state.valTxtCreateText}
-                    </p>
-                  )}
+                  initText="Profiltekst"/>
+                <Warning validationText={valTxtText}/>  
                 <FormButton
-                  handleSubmit={this.handleSubmitCreateAccount}
+                  handleSubmit={this.handleSubmitAccount}
                   label="Send"
                   iconLeft={<SendIcon/>}
+                  style={{ marginTop: "1rem" }}
+                />
+                <FormButton
+                  handleSubmit={e => {e.preventDefault(); this.clearAllErrorMessages(); this.setState({createAccount: false})}}
+                  label="Fortryd"
+                  iconLeft={<CancelIcon/>}
                   style={{ marginTop: "1rem" }}
                 />
                 {this.props.errorMessageCreateAccount && (
@@ -307,8 +399,6 @@ class Account extends Component {
                     {this.props.unsetErrorMessageCreateAccount()}
                   </p>
                 )}
-                
-                
               </form>
             )}
           </>

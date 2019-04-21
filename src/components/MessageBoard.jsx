@@ -88,7 +88,7 @@ const MessageBoard = props => {
           <TextArea
             initText="Skriv en besked"
             handleChange={handleFormChange}
-            message={message}
+            value={message}
           />
           <FormButton
             label={<><SendIcon /> Send </>}
@@ -109,7 +109,7 @@ const MessageBoard = props => {
                     <div>
                       <AccountIcon/>
                     </div>
-                    <div>
+                    <div className="user-date">
                       <p>{obj.profileName !== "undefined" || undefined ? obj.profileName: "Ukendt bruger"}</p>
                       <p>{obj.dateTime}</p>
                     </div>
@@ -129,28 +129,35 @@ const container = () => css`
   .list {
     margin-top: 1rem;
 
-    .header {
-      display: flex; 
-    
-      svg {
-        padding: 0.25rem 0.5rem 0 0;
-        font-size: 1.5rem;
-        height: 40px;
-        width: 40px;
-      }
-
-      p {
-        margin:0;
-      }
-    }
-
-    .body  {
-      padding-top: 0.5rem;
-    }
-
     .message {
       padding-top: 1rem;
+      border: 1px solid #4877E5;
+      border-radius: 10px;
+    
+      .header {
+        display: flex; 
+
+        .user-date {
+          font-size: 0.8rem;
+          color: darkgray;
+        }
+  
+        svg {
+          padding: 0.25rem 1rem 0 1rem;
+          height: 2rem;
+          width: 2rem;
+        }
+
+        p {
+          margin:0;
+        }
+      }
+
+      .body  {
+        padding: 0.5rem 0 1rem 4rem;
+      }
     }
+
   }
 
   .validation-text {

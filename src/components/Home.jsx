@@ -22,7 +22,7 @@ const Frontpage = props => {
                   <AccountIcon />
                   <h2>{obj.name}</h2>
                 </div>
-                <div className="description">{obj.description}</div>
+                <div className="text">{obj.text}</div>
                 {/* account */}
                 <Link to={`/user/:${obj.id}`}>
                   <FormButton
@@ -44,6 +44,8 @@ const container = () => css`
     .card-top {
       display: flex;
       align-items: center;
+      margin-top: 1rem;
+      border-bottom: 1px solid #4877E5;
 
       h2,
       svg {
@@ -51,7 +53,7 @@ const container = () => css`
       }
     }
 
-    .description {
+    .text {
       padding: 1rem 0 2rem 0;
     }
 

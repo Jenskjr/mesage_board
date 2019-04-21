@@ -8,11 +8,12 @@ const TextArea = props => {
   return (
     <div className={container()} style={props.style}>
       <textarea
-        rows="4"
+        rows={props.rows || 4}
         name={props.name}  
         onChange={props.handleChange}
         placeholder={props.initText}
-        value={props.message}
+        value={props.value}
+        defaultValue={props.defaultValue}
       />
     </div>
   );
@@ -24,6 +25,7 @@ const container = () => css`
     width: 100%;
     box-sizing: border-box;
     padding: 1rem;
+    border-radius: 5px;
   }
 `;
 

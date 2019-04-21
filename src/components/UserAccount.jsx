@@ -32,7 +32,7 @@ const UserAccount = props => {
         </div>
         <div>
         </div>
-        <div className="description">{userAccount.description}</div>
+        <div className="text">{userAccount.text}</div>
         <Link to={`/`}>
           <FormButton label="Tilbage" />
         </Link>
@@ -62,7 +62,7 @@ const container = () => css`
     }
   }
 
-  .description {
+  .text {
     padding: 1rem 0 2rem 0;
   }
 

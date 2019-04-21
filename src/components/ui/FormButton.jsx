@@ -22,7 +22,8 @@ const container = () => css`
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    border: 1px solid gray;
+    border: 2px solid #4877E5;
+    border-radius: 5px;
     background-color: white;
     color: black;
     padding: 1rem 0 1rem;

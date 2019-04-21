@@ -10,7 +10,8 @@ const TextInput = props => {
         type="text"
         onChange={props.handleChange}
         placeholder={props.initText}
-        value={props.value}
+        value={props.value} 
+        defaultValue={props.defaultValue || ""}
       />
     </div>
   );
@@ -22,6 +23,7 @@ const container = () => css`
     padding: 1rem;
     width: 100%;
     box-sizing: border-box;
+    border-radius: 5px;
   }
 `;
 
