@@ -47,8 +47,8 @@ const EditAccount = props => {
         e.target.name === "text" && setText(e.target.value);
     }
 
-    const handleUpdateAccount = () => {
-
+    const handleUpdateAccount = e => {
+        e.preventDefault();
         clearAllValidations();
 
         if (name === undefined || name === "" ) setValName("Navn mangler at blive udfyldt");

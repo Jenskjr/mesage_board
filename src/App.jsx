@@ -19,10 +19,10 @@ import Account from "./components/Account";
 
 // version 1.0
 
-// cors policy
-// Omskriving af account -> create account m. UseState
-// setTimeOut inserts 8????
+// fix console errors
 // spinner på log in
+// cors policy
+// setTimeOut inserts 8????
 
 // Version 2.0
 // Implement redux state managaer
