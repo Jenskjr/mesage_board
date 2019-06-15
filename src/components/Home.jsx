@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import { css } from "emotion";
 import { Link } from "react-router-dom";
 import { AccountIcon } from "mdi-react";
 // Components
-import FormButton from "./ui/FormButton";
+import Button from "./ui/Button";
 
 const Frontpage = props => {
   const { accounts } = props;
@@ -22,7 +22,7 @@ const Frontpage = props => {
                 <div className="text">{obj.text}</div>
                 {/* account */}
                 <Link to={`/user/:${obj.id}`}>
-                  <FormButton
+                  <Button
                     label="Se min profil"
                     iconLeft={<AccountIcon />}
                   />

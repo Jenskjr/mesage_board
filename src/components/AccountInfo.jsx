@@ -1,11 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 // css
 import { css } from "emotion";
-import { AccountIcon, ErrorIcon } from "mdi-react";
-// components 
-import Warning from "./ui/Warning";
-import TextInput from "./ui/TextInput";
-import FormButton from "./ui/FormButton";
 
 const AccountInfo = props => {
     const { account } = props;

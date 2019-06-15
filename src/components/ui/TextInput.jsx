@@ -1,17 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 // css
 import { css } from "emotion";
 
 const TextInput = props => {
   return (
     <div className={container()}>
+
       <input
         name={props.name}
         type="text"
         onChange={props.handleChange}
         placeholder={props.initText}
-        value={props.value} 
-        defaultValue={props.defaultValue || ""}
+        value={props.value || ""}
       />
     </div>
   );

@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 // css
 import { css } from "emotion";
 
 const TextArea = props => {
-  const [value, setValue] = useState();
 
   return (
     <div className={container()} style={props.style}>

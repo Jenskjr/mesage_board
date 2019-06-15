@@ -1,6 +1,7 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import TextArea from "./ui/TextArea";
 import FormButton from "./ui/FormButton";
+import Warning from "./ui/Warning";
 import axios from "axios";
 
 //css
@@ -9,14 +10,13 @@ import { SendIcon, AccountIcon } from "mdi-react";
 
 const MessageBoard = props => {
   const [posts, setPosts] = useState([]);
-  //const [post, setPost] = useState({});
   const [message, setMessage] = useState("");
-  const [validationText, setValidationText] = useState(""); 
+  const [warning, setWarning] = useState();
+
   let timer; 
   
   // componentDidMount
   useEffect(() => {
-    console.log("Component did mount")
     getPosts();
   },[]);
 
@@ -27,23 +27,20 @@ const MessageBoard = props => {
     }
   },[])
 
+  // call this function every 30 seconds
   const getPosts =  async () => {
-    console.log("Call me every 30 seconds");
     const reqUrl = `${props.baseUrl}/posts`;
-
-    await axios
-      .get(reqUrl)
-      .then(
-        function(response) {
-          setPosts(response.data);
-        }.bind(this) // In axios this refers to axios not the class. Solved with bind(this) Har jeg stadig brug for den i functional component
-      )
-      .catch(function(error) {
-        console.log(error);
-      });
+    try {
+      let { data } = await axios.get(reqUrl);
+      setPosts(data)
+    } catch (error) {
+      setWarning(true)
+    }
+    finally {
       timer = setTimeout(() => {
         getPosts();
       }, 10000); 
+    }
   };
 
   const handleFormChange = e => {
@@ -52,36 +49,29 @@ const MessageBoard = props => {
   };  
   
   const handlePostSubmit = e => {
-    e.preventDefault();
-    setValidationText("");
-    message === "" &&
-      setValidationText("Besked mangler at blive udfyldt");
     if (message.length > 0) {
-      const thisMessage = message; // copy
-      const thisProfileName = props.account.name ? props.account.name: "Ukendt bruger"
-      const post = { profileName: thisProfileName, message: thisMessage };
+      const accountName = props.account.name ? props.account.name: "Ukendt bruger"
+      const post = { accountName: accountName, message };
       sendPost(post);
     }
   };
 
+  // try catch mangler her
   const sendPost = async post => {
     const reqUrl = `${props.baseUrl}/post`;
-
-    await axios
-      .post(reqUrl, post)
-      .then(
-        function(response) {
-          setPosts(response.data);
-          setMessage("");
-        }.bind(this) // In axios this refers to axios not the class. Solved with bind(this)
-      )
-      .catch(function(error) {
-        console.log(error);
-      });
+    try {
+      let { data } = await axios.post(reqUrl, post)
+      setPosts(data)
+      setMessage("")
+    } 
+    catch (error) {
+      setWarning(true)
+    }
   };
 
   return (
     <div className={container()}>
+      {warning && <Warning validationText={"An error occurred"}/>}
        {/* Form */}
        <form>
           <h2>Skriv en besked</h2>
@@ -96,10 +86,6 @@ const MessageBoard = props => {
             handleSubmit={e => handlePostSubmit(e)}
           />
         </form>
-        {/* Validation */}
-        {validationText && (
-          <div className="validation-text">{validationText}</div>
-        )}
         {/* MessageList */}
         <div className="list">
             {posts.length > 0 &&

@@ -4,7 +4,7 @@ import { css } from "emotion";
 import { ErrorIcon } from "mdi-react";
 
 const TextInput = props => {
-    const [warning, setWarning] = useState(true)
+    const [warning] = useState(true)
   
     return (
     <div className={container()}>
@@ -12,9 +12,6 @@ const TextInput = props => {
       <p className="error-message">
         <ErrorIcon />
         {props.validationText}
-         {/* {setTimeout(() => {
-             setWarning(false)
-         }, 10000)} */}
       </p>
       }
     </div>
@@ -27,6 +24,17 @@ const container = () => css`
     padding: 1rem;
     width: 100%;
     box-sizing: border-box;
+  }
+
+  svg {
+    margin-right: 0.5rem;
+    color: darkred;
+  }
+
+  .error-message {
+    display: flex;
+    align-items: center;
+    color: darkred;
   }
 `;
 

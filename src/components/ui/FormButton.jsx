@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 // css
 import { css } from "emotion";
 
 const FormButton = props => {
   return (
     <div className={container()} style={props.style}>
-      <button onClick={props.handleSubmit}>
+      <button onClick={e => {e.preventDefault(); props.handleSubmit && props.handleSubmit(e)}}>
         {props.iconLeft && props.iconLeft}
         {props.label}
       </button>

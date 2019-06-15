@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 //Components
-import FormButton from "./ui/FormButton";
+import Button from "./ui/Button";
 
 //css
 import { css } from "emotion";
@@ -21,6 +21,7 @@ const UserAccount = props => {
             <img
               className="image"
               src={process.env.PUBLIC_URL + `/profileImages/${userAccount.image}.jpg`}
+              alt=""
             />
             <div>
               <h2>{userAccount.name}</h2>
@@ -34,7 +35,7 @@ const UserAccount = props => {
         </div>
         <div className="text">{userAccount.text}</div>
         <Link to={`/`}>
-          <FormButton label="Tilbage" />
+          <Button label="Tilbage" />
         </Link>
       </div> 
   )

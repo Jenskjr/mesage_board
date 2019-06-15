@@ -4,25 +4,119 @@ import { css } from "emotion";
 import { AccountPlusIcon, AccountEditIcon } from "mdi-react";
 // components
 import FormButton from "./ui/FormButton";
-import EditAccount from "./EditAccount";
-import CreateAccount from "./CreateAccount";
-import Login from "./Login";
+import EditAccount from "./ui/EditAccount";
+import Login from "./ui/Login";
 import Accountinfo from "./AccountInfo";
 
 class Account extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      editAccount: JSON.parse(localStorage.getItem("editAccount")) || false
+      editAccount: JSON.parse(localStorage.getItem("editAccount")) || false,
+      createAccount: JSON.parse(localStorage.getItem("createAccount")) || false,
+      formData: {
+        loginName: undefined, 
+        loginPassword: undefined
+      }
     };
   }
-
-  handleUnsetEdit = () => {
-    this.setState({editAccount: false}, () => localStorage.removeItem("editAccount"));
+  
+  unsetEdit = () => {
+    this.setState({editAccount: false, formData: []}, () => localStorage.removeItem("editAccount"));
   }
 
+  unsetCreate = () => {
+    this.setState({createAccount: false, formData: []}, () => localStorage.removeItem("createAccount"));
+  }
+
+  // This is because of render prosp
+  setInitFormData = (account) => {
+    this.setState({
+      formData: {
+        name: account.name,
+        age: account.age,
+        occupation: account.occupation,
+        region: account.region,
+        text: account.text 
+      }
+    })
+  }
+
+  handleFormChange = e => {
+    this.setState({formData: {
+      ...this.state.formData,
+      [e.target.name]: e.target.value
+    }}, () => {
+      this.validateLoginForm();
+      this.validateEditForm();
+      this.validateCreateForm();
+    })
+  }
+  validateLoginForm = () => {
+    let { loginName, loginPassword } = this.state.formData
+    loginName && loginPassword ? this.setState({validLogin: true}): this.setState({validLogin: false})
+  }
+
+  validateEditForm = () => {
+    let {name, password, age, occupation, region, text } = this.state.formData
+    name && password && age && occupation && region && text ? this.setState({validEdit: true}): this.setState({validEdit: false})
+  }
+
+  validateCreateForm = () => {
+    let {name, password, age, occupation, region, text } = this.state.formData
+    name && password && age && occupation && region && text ? this.setState({validCreate: true}): this.setState({validCreate: false})
+  }
+
+  handleSubmitLogin = e => {
+    let { loginName, loginPassword } = this.state.formData
+    let { validLogin } = this.state
+    validLogin && this.props.handleLogin(validLogin, loginName, loginPassword)
+  }
+
+  handleSubmitEdit = e => {
+    let { name, password, age, occupation, region, text } = this.state.formData
+    let { account } = this.props
+    let { validEdit } = this.state
+    account = {
+      id: account.id,
+      name: name,
+      password: password,
+      age: age,
+      occupation: occupation,
+      region: region,
+      text: text
+    }
+ 
+    if (validEdit) {
+      this.props.updateAccount(account);
+      this.unsetEdit();
+    } 
+  }
+
+  handleSubmitCreate = e => {
+    let { name, password, age, occupation, region, text } = this.state.formData;
+    let { account } = this.props;
+    let { validCreate } = this.state;
+
+    account = {
+      name: name,
+      password: password,
+      age: age,
+      occupation: occupation,
+      region: region,
+      text: text
+    };
+
+    if (validCreate) {
+      this.props.createAccount(account);
+      this.unsetCreate();
+    } 
+   }
+
+
   render() {
-    const { account } = this.props;
+    let { loginName, loginPassword, name, password, age, occupation, region, text} = this.state.formData;
+    let { account } = this.props;
 
     return (
       <div className={container()}>
@@ -37,7 +131,8 @@ class Account extends Component {
                   label="Rediger profil"
                   iconLeft={<AccountEditIcon/>}
                   style={{ marginTop: "1rem" }}
-                  handleSubmit={() => {this.setState({editAccount: true}, () => localStorage.setItem("editAccount", this.state.editAccount)); }}
+                  handleSubmit={() => {   
+                    this.setState({editAccount: true}, () => localStorage.setItem("editAccount", this.state.editAccount)); }}
                 />
                 <FormButton
                   label="Log ud"
@@ -49,9 +144,18 @@ class Account extends Component {
             {/* Edit account */}
             {this.state.editAccount && 
               <EditAccount 
+                handleFormChange={this.handleFormChange}
+                handleSubmit={this.handleSubmitEdit}
+                setInitFormData={this.setInitFormData}
+                name={name}
+                password={password}
+                age={age}
+                occupation={occupation}
+                region={region}
+                text={text}
                 account={account} 
-                unsetEdit={this.handleUnsetEdit} 
-                updateAccount={this.props.updateAccount}/>}
+                unsetEdit={this.unsetEdit}
+                />}
           </>
         )}
         {/* Login or create account */}
@@ -60,25 +164,35 @@ class Account extends Component {
             {/* Login */}
             {!this.state.createAccount && <>
               <Login 
+                handleFormChange={this.handleFormChange}
+                handleSubmit={this.handleSubmitLogin} 
+                name={loginName}
+                password={loginPassword}
                 errorMessageAuthentication={this.props.errorMessageAuthentication}
                 unsetErrorMessageLogIn={this.props.unsetErrorMessageLogIn}
-                handleLogin={this.props.handleLogIn}/>
+              />
               <FormButton
                 label="Lav en ny profil"
                 iconLeft={<AccountPlusIcon/>}
                 style={{ marginTop: "1rem" }}
                 handleSubmit={() => {
-                  this.setState({ createAccount: true });
-                }}
+                  this.setState({createAccount: true}, () => localStorage.setItem("createAccount", this.state.createAccount)); }}
               />
             </>}
             {/* Create account */}
             {this.state.createAccount && (
               <>
-                <CreateAccount 
-                  createAccount={this.props.createAccount} 
-                  errorMessageCreateAccount={this.props.errorMessageCreateAccount}
-                  unsetErrorMessageCreateAccount={this.props.unsetErrorMessageCreateAccount}/>
+                <EditAccount 
+                  handleFormChange={this.handleFormChange}
+                  handleSubmit={this.handleSubmitCreate}
+                  name={name}
+                  password={password}
+                  age={age}
+                  occupation={occupation}
+                  region={region}
+                  text={text}
+                  unsetEdit={this.unsetCreate} 
+                />
               </>
             )}
           </>
@@ -105,11 +219,11 @@ const container = () => css`
     font-size: 1rem;
   }
 
-  .validation-text {
+  /* .validation-text {
     padding: 1rem 0 1rem 0;
-  }
+  } */
 
-  form {
+  /* form {
     .error-message {
       display: flex;
       align-items: center;
@@ -118,7 +232,7 @@ const container = () => css`
         padding-right: 0.5rem;
       }
     }
-  }
+  } */
 `;
 
 export default Account;
