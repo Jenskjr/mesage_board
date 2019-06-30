@@ -50,7 +50,6 @@ const CreateAccount = props => {
             region &&
             text
         ) {
-            console.log("Update account");
             const createdAccount = {
                 name: name,
                 password: password,

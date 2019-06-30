@@ -39,7 +39,7 @@ const Header = props => {
     <nav>
       <div className="right">
         <div onClick={() => {props.handleLogOut(); setLogOutButton(false)}}>
-          LogOut
+          Log ud
         </div>
       </div>
     </nav>

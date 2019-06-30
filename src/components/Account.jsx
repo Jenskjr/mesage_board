@@ -21,8 +21,17 @@ class Account extends Component {
     };
   }
   
+  setEdit = () => {
+    this.setState({editAccount: true}, () => localStorage.setItem("editAccount", this.state.editAccount));
+  }
+  
   unsetEdit = () => {
     this.setState({editAccount: false, formData: []}, () => localStorage.removeItem("editAccount"));
+  }
+
+
+  setCreate = () => {
+    this.setState({createAccount: true}, () => localStorage.setItem("createAccount", this.state.createAccount));
   }
 
   unsetCreate = () => {
@@ -71,6 +80,7 @@ class Account extends Component {
     let { loginName, loginPassword } = this.state.formData
     let { validLogin } = this.state
     validLogin && this.props.handleLogin(validLogin, loginName, loginPassword)
+    this.unsetEdit();
   }
 
   handleSubmitEdit = e => {
@@ -132,13 +142,19 @@ class Account extends Component {
                   iconLeft={<AccountEditIcon/>}
                   style={{ marginTop: "1rem" }}
                   handleSubmit={() => {   
-                    this.setState({editAccount: true}, () => localStorage.setItem("editAccount", this.state.editAccount)); }}
+                    this.setEdit();
+                    this.unsetCreate();
+                  }}
                 />
                 <FormButton
                   label="Log ud"
                   iconLeft={<AccountEditIcon/>}
                   style={{ marginTop: "1rem" }}
-                  handleSubmit={() => {this.props.handleLogOut()}}
+                  handleSubmit={() => {
+                    this.props.handleLogOut();
+                    this.unsetEdit();
+                    this.unsetCreate();
+                  }}
                 />
               </>}
             {/* Edit account */}
@@ -176,7 +192,10 @@ class Account extends Component {
                 iconLeft={<AccountPlusIcon/>}
                 style={{ marginTop: "1rem" }}
                 handleSubmit={() => {
-                  this.setState({createAccount: true}, () => localStorage.setItem("createAccount", this.state.createAccount)); }}
+                  this.setState({formData: []})
+                  this.setCreate();
+                  this.unsetEdit();
+                }}
               />
             </>}
             {/* Create account */}

@@ -99,14 +99,12 @@ const App = () => {
         const reqUrl = `${baseUrl}/auth/`;
         let { data } = await axios.get(reqUrl, { 'headers': {'userName': userName, 'token': password}});
         setAccount(data)
-        console.log(data)
-
       }
     } catch (error) {
-     
-      console.log(error.response.data);
-      console.log(error.response.status);
-      console.log(error.response.headers);
+      console.log(error);
+      // console.log(error.response.data);
+      // console.log(error.response.status);
+      // console.log(error.response.headers);
       
       setErrorMessageAuthentication(
         `Kunne ikke logge ind. Prøv igen`
@@ -117,7 +115,7 @@ const App = () => {
   // logout
   const handleLogOut = () => {
     localStorage.removeItem("authToken")
-    setAccount({}, console.log("set account"))
+    setAccount({})
   };
 
   // update account
